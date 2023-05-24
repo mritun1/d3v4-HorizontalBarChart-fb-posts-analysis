@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    .chart {
+      width: 400px;
+      height: 300px;
+    }
+    
+  </style>
+</head>
+<body>
+  <div id="chart_div" class="chart"></div>
+
+  <script>
+    // Define the data array
+    var data = [
+      { imageUrl: 'https://cdn.pixabay.com/photo/2018/08/14/13/23/ocean-3605547_1280.jpg', likes: 100, impressions: 200, comments: 50, date:'2-12-2023' },
+      { imageUrl: 'https://images.ctfassets.net/9wtva4vhlgxb/79pPIkFKrpEaO3dLm3C0I9/61333249bb8b3c6884d47fbfef13840a/IconMonth-2.png?fm=webp&q=70', likes: 150, impressions: 180, comments: 80, date:'12-12-2023' },
+      { imageUrl: 'https://img.freepik.com/free-photo/neon-tropical-monstera-leaf-banner_53876-138943.jpg?w=2000', likes: 200, impressions: 220, comments: 70, date:'12-12-2023' },
+      { imageUrl: 'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg', likes: 120, impressions: 160, comments: 60, date:'12-12-2023' },
+      { imageUrl: 'https://akm-img-a-in.tosshub.com/businesstoday/images/story/202202/untitled_design_6-sixteen_nine.png?size=1200:675', likes: 180, impressions: 210, comments: 90, date:'12-12-2023' }
+    ];
+
+    // Define the chart dimensions
+    var margin = { top: 40, right: 20, bottom: 30, left: 120 };
+    var width = 700 - margin.left - margin.right;
+    var height = 600 - margin.top - margin.bottom;
+
+    // Create the SVG element
+    var svg = d3.select("#chart_div")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Define the x-scale and y-scale
+    var x = d3.scaleLinear()
+      .range([0, width])
+      .domain([0, d3.max(data, function(d) { return d.likes + d.impressions + d.comments; })]);
+
+    var y = d3.scaleBand()
+      .range([height, 0])
+      .padding(0.1)
+      .domain(data.map(function(d, i) { return i; }));
+
+      // Append the images for population 2010
+svg.selectAll(".image2010")
+  .data(data)
+  .enter()
+  .append("image")
+  .attr("class", "image image2010 p-l-20")
+  .attr("xlink:href", function(d) { return d.imageUrl; }) // Use the 'imageUrl' property from the data
+  .attr("x", -80) // Adjust the x position as needed
+  .attr("y", function(d, i) { return y(i) + y.bandwidth() / 4; }) // Adjust the y position as needed
+  .attr("width", 80) // Adjust the width of the image
+  .attr("height", y.bandwidth() / 2)
+  .style("opacity", 1); // Ensure the image is fully visible
+
+// Append the bars for likes
+svg.selectAll(".barLikes")
+  .data(data)
+  .enter()
+  .append("rect")
+  .attr("class", "bar barLikes")
+  .attr("y", function(d, i) { return y(i); })
+  .attr("height", y.bandwidth() / 4)
+  .attr("x", 0)
+  .attr("width", function(d) { return x(d.likes); })
+  .attr("fill", function(d, i) { return i % 2 === 0 ? "steelblue" : "lightsteelblue"; });
+
+// Append the bars for impressions
+svg.selectAll(".barImpressions")
+  .data(data)
+  .enter()
+  .append("rect")
+  .attr("class", "bar barImpressions")
+  .attr("y", function(d, i) { return y(i) + y.bandwidth() / 4; })
+  .attr("height", y.bandwidth() / 4)
+  .attr("x", 0)
+  .attr("width", function(d) { return x(d.impressions); })
+  .attr("fill", function(d, i) { return i % 2 === 0 ? "steelblue" : "lightsteelblue"; });
+
+// Append the bars for comments
+svg.selectAll(".barComments")
+  .data(data)
+  .enter()
+  .append("rect")
+  .attr("class", "bar barComments")
+  .attr("y", function(d, i) { return y(i) + y.bandwidth() / 2; })
+  .attr("height", y.bandwidth() / 4)
+  .attr("x", 0)
+  .attr("width", function(d) { return x(d.comments); })
+  .attr("fill", function(d, i) { return i % 2 === 0 ? "steelblue" : "lightsteelblue"; });
+
+
+  //-----------------------------
+  // Append the images for population 2010
+var imageGroup = svg.selectAll(".imageGroup")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr("class", "imageGroup")
+  .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
+
+
+imageGroup.append("image")
+  .attr("class", "image image2010")
+  .attr("xlink:href", function(d) { return d.imageUrl; }) // Use the 'imageUrl' property from the data
+  .attr("x", -60) // Adjust the x position as needed
+  .attr("y", y.bandwidth() / 4) // Adjust the y position as needed
+  .attr("width", 50) // Adjust the width of the image
+  .attr("height", y.bandwidth() / 2)
+  .style("opacity", 1); // Ensure the image is fully visible
+
+imageGroup.append("text")
+  .attr("class", "dataLabel dateLabel")
+  .text(function(d) { return d.date; })
+  .attr("x", 60) // Adjust the x position as needed
+  .attr("y", -10) // Adjust the y position as needed
+  .style("font-size", "12px")
+  .style("fill", "#333");
+
+// Append the bars for likes
+var likesGroup = svg.selectAll(".likesGroup")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr("class", "likesGroup")
+  .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
+
+likesGroup.append("rect")
+  .attr("class", "bar barLikes")
+  .attr("y", 0)
+  .attr("height", y.bandwidth() / 4)
+  .attr("x", 0)
+  .attr("width", function(d) { return x(d.likes); })
+  .attr("fill", "#1f77b4");
+
+likesGroup.append("text")
+  .attr("class", "dataLabel likesLabel")
+  .text(function(d) { return d.likes; })
+  .attr("x", function(d) { return x(d.likes) + 5; }) // Adjust the x position as needed
+  .attr("y", y.bandwidth() / 8) // Adjust the y position as needed
+  .style("font-size", "12px")
+  .style("fill", "#333");
+
+//----------DATE
+
+
+//---------------------------------------
+
+// Append the bars for impressions
+var impressionsGroup = svg.selectAll(".impressionsGroup")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr("class", "impressionsGroup")
+  .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
+
+impressionsGroup.append("rect")
+  .attr("class", "bar barImpressions")
+  .attr("y", y.bandwidth() / 4)
+  .attr("height", y.bandwidth() / 4)
+  .attr("x", 0)
+  .attr("width", function(d) { return x(d.impressions); })
+  .attr("fill", "#ff7f0e");
+
+impressionsGroup.append("text")
+  .attr("class", "dataLabel impressionsLabel")
+  .text(function(d) { return d.impressions; })
+  .attr("x", function(d) { return x(d.impressions) + 5; }) // Adjust the x position as needed
+  .attr("y", y.bandwidth() / 2) // Adjust the y position as needed
+  .style("font-size", "12px")
+  .style("fill", "#333");
+
+// Append the bars for comments
+var commentsGroup = svg.selectAll(".commentsGroup")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr("class", "commentsGroup")
+  .attr("transform", function(d, i) { return "translate(0," + y(i) + ")"; });
+
+commentsGroup.append("rect")
+  .attr("class", "bar barComments")
+  .attr("y", y.bandwidth() / 2)
+  .attr("height", y.bandwidth() / 4)
+  .attr("x", 0)
+  .attr("width", function(d) { return x(d.comments); })
+  .attr("fill", "#2ca02c");
+
+commentsGroup.append("text")
+  .attr("class", "dataLabel commentsLabel")
+  .text(function(d) { return d.comments; })
+  .attr("x", function(d) { return x(d.comments) + 5; }) // Adjust the x position as needed
+  .attr("y", y.bandwidth() * 0.75) // Adjust the y position as needed
+  .style("font-size", "12px")
+  .style("fill", "#333");
+
+  //################
+
+// Append axis labels
+svg.append("text")
+  .attr("class", "axisLabel")
+  .attr("x", width / 2)
+  .attr("y", height + margin.bottom)
+  .style("text-anchor", "middle")
+  .style("font-size", "14px")
+  .style("fill", "#333")
+  .text(function() {
+    var text = "Likes, Impressions, Comments";
+    var categories = text.split(", ");
+    var colorCodes = ["#FF0000", "#00FF00", "#0000FF"]; // Example color codes for Likes, Impressions, Comments
+
+    // Append color-coded squares and category labels
+    var labelGroup = svg.append("g")
+      .attr("class", "labelGroup")
+      .attr("transform", "translate(0," + (height + margin.bottom - 590) + ")");
+
+    var labels = labelGroup.selectAll(".label")
+      .data(categories)
+      .enter()
+      .append("g")
+      .attr("class", "label")
+      .attr("transform", function(d, i) {
+        return "translate(" + (i * 100) + ", 0)"; // Adjust the positioning of labels
+      });
+
+    labels.append("rect")
+      .attr("width", 10) // Adjust the size of the color box
+      .attr("height", 10) // Adjust the size of the color box
+      .attr("fill", function(d, i) {
+        return colorCodes[i]; // Use color codes based on the index
+      });
+
+    labels.append("text")
+      .attr("x", 15) // Adjust the positioning of text
+      .attr("y", 9) // Adjust the positioning of text
+      .text(function(d) {
+        return d;
+      });
+
+    return null; // Return null to prevent rendering duplicate text
+  });
+
+//####################
+
+
+
+//###############
+
+    svg.append("text")
+      .attr("class", "axisLabel")
+      //.attr("x", -margin.left)
+      .attr("x", -100)
+      .attr("y", -margin.top / 2)
+      .style("text-anchor", "start")
+      .text("FB Post Images")
+      .style("font-size", "14px")
+      .style("fill", "#333");
+  //----------------------------
+
+// Append the y-axis
+svg.append("g")
+  .attr("class", "y-axis")
+  .call(d3.axisLeft(y))
+  .selectAll("text")
+  .remove(); // Remove the y-axis labels
+
+// Append the x-axis
+svg.append("g")
+  .attr("class", "x-axis")
+  .attr("transform", "translate(0," + height + ")")
+  .call(d3.axisBottom(x));
+
+
+
+
+
+
+
+    
+  </script>
+</body>
+</html>
